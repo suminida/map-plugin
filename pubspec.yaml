@@ -1,0 +1,23 @@
+name: itsi_map
+description: Flutter 지도 플러그인 - vWorld 타일 지원, 마커, 데이터 레이어, 상호작용 기능
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter: ^4.4.2
+  http: ^1.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  assets:
+    - assets/html/map.html

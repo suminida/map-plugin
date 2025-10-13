@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/suuu/ldmi/trunk/assets/js/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
