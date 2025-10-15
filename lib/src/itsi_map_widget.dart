@@ -10,7 +10,7 @@ class ItsiMapWidget extends StatefulWidget {
   final ItsiMapController controller;
   final LatLng initialCenter; // 위도, 경도
   final double initialZoom; // 줌 레벨
-  final String apiKey; // VWorld API Key
+  final String? apiKey; // VWorld API Key (선택사항, 기본값 제공)
   final Function(LatLng center, double zoom)? onPositionChanged;
   final Function(LatLng position)? onTap;
   final Function(LatLng position)? onLongPress;
@@ -20,7 +20,7 @@ class ItsiMapWidget extends StatefulWidget {
     required this.controller,
     required this.initialCenter,
     this.initialZoom = 13.0,
-    required this.apiKey,
+    this.apiKey,
     this.onPositionChanged,
     this.onTap,
     this.onLongPress,
@@ -31,6 +31,9 @@ class ItsiMapWidget extends StatefulWidget {
 }
 
 class _ItsiMapWidgetState extends State<ItsiMapWidget> {
+  /// 기본 VWorld API Key (데모/테스트용)
+  static const String _defaultApiKey = '848E8D3A-D942-3606-A929-B8F4455B96DF';
+
   WebViewController? _webViewController;
   bool _isMapReady = false;
 
@@ -81,8 +84,9 @@ class _ItsiMapWidgetState extends State<ItsiMapWidget> {
 
     // 초기 지도 설정 (약간의 지연 후 실행)
     Future.delayed(const Duration(milliseconds: 100), () {
+      final apiKey = widget.apiKey ?? _defaultApiKey;
       _webViewController?.runJavaScript(
-        'initMap(${widget.initialCenter.latitude}, ${widget.initialCenter.longitude}, ${widget.initialZoom}, "${widget.apiKey}");',
+        'initMap(${widget.initialCenter.latitude}, ${widget.initialCenter.longitude}, ${widget.initialZoom}, "$apiKey");',
       );
       widget.controller.updateState(widget.initialCenter, widget.initialZoom);
     });

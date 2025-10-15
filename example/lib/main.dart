@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:itsi_map/itsi_map.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'offline_map_test_page.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -15,7 +18,54 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MapPage(),
+      home: const HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('itsi_map 예제'),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.map, color: Colors.blue),
+              title: const Text('지도 위젯'),
+              subtitle: const Text('기본 지도 기능 테스트'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MapPage()),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.cloud_download, color: Colors.green),
+              title: const Text('오프라인 지도 생성'),
+              subtitle: const Text('2km x 2km 영역 지도 생성 테스트'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const OfflineMapTestPage()),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -50,7 +100,7 @@ class _MapPageState extends State<MapPage> {
       ),
       body: ItsiMapWidget(
         controller: _mapController,
-        apiKey: '848E8D3A-D942-3606-A929-B8F4455B96DF', // 실제 운영시 환경변수 사용
+        apiKey: dotenv.env['VWORLD_API_KEY'] ?? '',
         initialCenter: const LatLng(37.5665, 126.9780),
         initialZoom: 13.0,
         onPositionChanged: (center, zoom) {
