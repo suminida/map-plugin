@@ -8,8 +8,8 @@ import 'models/lat_lng.dart';
 /// 지도 위젯
 class ItsiMapWidget extends StatefulWidget {
   final ItsiMapController controller;
-  final LatLng initialCenter;
-  final double initialZoom;
+  final LatLng initialCenter; // 위도, 경도
+  final double initialZoom; // 줌 레벨
   final String apiKey; // VWorld API Key
   final Function(LatLng center, double zoom)? onPositionChanged;
   final Function(LatLng position)? onTap;
@@ -41,30 +41,33 @@ class _ItsiMapWidgetState extends State<ItsiMapWidget> {
   }
 
   Future<void> _initWebView() async {
-    // HTML 로드
+    // HTML 로드 (패키지 assets 경로로 수정)
     final htmlContent = await rootBundle.loadString('packages/itsi_map/assets/html/map.html');
 
+    // webview에 HTML을 띄움
     _webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setJavaScriptMode(JavaScriptMode.unrestricted) // HTML 안의 JavaScript 실행 허용
       ..setBackgroundColor(Colors.white)
-      ..addJavaScriptChannel(
+      ..addJavaScriptChannel(                         // flutter와 통신할 채널 생성, JS → Flutter 로 메시지를 보낼 통로 생성
         'FlutterChannel',
         onMessageReceived: (JavaScriptMessage message) {
           _handleMapEvent(message.message);
         },
       )
-      ..setNavigationDelegate(
+      ..setNavigationDelegate(                       // HTML 페이지가 다 로드되었을 때(onPageFinished) 실행할 콜백
         NavigationDelegate(
           onPageFinished: (String url) {
             _onMapReady();
           },
         ),
       )
-      ..loadHtmlString(htmlContent);
+      ..loadFlutterAsset('packages/itsi_map/assets/html/map.html');
+      // ..loadHtmlString(htmlContent);                // 실제 HTML 문자열을 WebView에 띄움
 
     widget.controller.attachWebView(_webViewController);
   }
 
+  /// js의 initMap 함수 호출
   void _onMapReady() {
     if (_isMapReady) return; // 중복 호출 방지
 
@@ -81,6 +84,8 @@ class _ItsiMapWidgetState extends State<ItsiMapWidget> {
     });
   }
 
+  /// 지도 이벤트 수신
+  /// js에서 전달받은 메시지 flutter에 세팅하는 함수
   void _handleMapEvent(String message) {
     try {
       final data = jsonDecode(message);
@@ -127,6 +132,8 @@ class _ItsiMapWidgetState extends State<ItsiMapWidget> {
     super.dispose();
   }
 
+  /// double 타입으로 형변환
+  /// - [v]: 변환할 값
   double _asDouble(dynamic v) {
     if (v is num) return v.toDouble();
     return double.tryParse(v.toString()) ?? 0.0;
