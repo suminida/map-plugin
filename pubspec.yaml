@@ -1,5 +1,5 @@
 name: itsi_map
-description: Flutter 지도 플러그인 - vWorld 타일 지원, 마커, 데이터 레이어, 상호작용 기능
+#description: Flutter 지도 플러그인 - vWorld 타일 지원, 마커, 데이터 레이어, 상호작용 기능
 version: 1.0.0
 publish_to: none
 
