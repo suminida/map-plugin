@@ -31,7 +31,7 @@ class ItsiMapWidget extends StatefulWidget {
 }
 
 class _ItsiMapWidgetState extends State<ItsiMapWidget> {
-  late WebViewController _webViewController;
+  WebViewController? _webViewController;
   bool _isMapReady = false;
 
   @override
@@ -45,7 +45,7 @@ class _ItsiMapWidgetState extends State<ItsiMapWidget> {
     final htmlContent = await rootBundle.loadString('packages/itsi_map/assets/html/map.html');
 
     // webview에 HTML을 띄움
-    _webViewController = WebViewController()
+    final controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted) // HTML 안의 JavaScript 실행 허용
       ..setBackgroundColor(Colors.white)
       ..addJavaScriptChannel(                         // flutter와 통신할 채널 생성, JS → Flutter 로 메시지를 보낼 통로 생성
@@ -64,7 +64,11 @@ class _ItsiMapWidgetState extends State<ItsiMapWidget> {
       ..loadFlutterAsset('packages/itsi_map/assets/html/map.html');
       // ..loadHtmlString(htmlContent);                // 실제 HTML 문자열을 WebView에 띄움
 
-    widget.controller.attachWebView(_webViewController);
+    setState(() {
+      _webViewController = controller;
+    });
+
+    widget.controller.attachWebView(controller);
   }
 
   /// js의 initMap 함수 호출
@@ -77,7 +81,7 @@ class _ItsiMapWidgetState extends State<ItsiMapWidget> {
 
     // 초기 지도 설정 (약간의 지연 후 실행)
     Future.delayed(const Duration(milliseconds: 100), () {
-      _webViewController.runJavaScript(
+      _webViewController?.runJavaScript(
         'initMap(${widget.initialCenter.latitude}, ${widget.initialCenter.longitude}, ${widget.initialZoom}, "${widget.apiKey}");',
       );
       widget.controller.updateState(widget.initialCenter, widget.initialZoom);
@@ -123,7 +127,12 @@ class _ItsiMapWidgetState extends State<ItsiMapWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return WebViewWidget(controller: _webViewController);
+    if (_webViewController == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    return WebViewWidget(controller: _webViewController!);
   }
 
   @override
